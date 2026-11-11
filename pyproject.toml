@@ -1,0 +1,17 @@
+[project]
+name = "vani-lab-task"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+authors = [
+    { name = "vijay-aid-007", email = "vijayjoka25@gmail.com" }
+]
+requires-python = ">=3.11"
+dependencies = []
+
+[project.scripts]
+vani-lab-task = "vani_lab_task:main"
+
+[build-system]
+requires = ["uv_build>=0.12.23,<0.13.0"]
+build-backend = "uv_build"
