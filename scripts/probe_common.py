@@ -9,6 +9,7 @@ from dataclasses import asdict
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
+from dotenv import load_dotenv
 
 import httpx
 
@@ -20,7 +21,7 @@ log = logging.getLogger("probe")
 _WORDS = ("the", "model", "reads", "some", "text", "about", "queues", "and")
 _FIXED_WORDS = 12  # words in the fixed wrapper text; used for estimates only
 
-
+load_dotenv(config.ROOT / ".env")  # does not override a variable already set in the environment
 def make_prompt(n_words: int) -> list[dict[str, str]]:
     """Deterministic prompt: ~n_words of padding + a question that elicits a long answer."""
     padding = " ".join(_WORDS[i % len(_WORDS)] for i in range(n_words))
