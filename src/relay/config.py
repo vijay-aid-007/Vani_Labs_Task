@@ -80,16 +80,16 @@ LLM_TEMPERATURE: float | None = None
 LLM_TIMEOUT_S: float = 60.0  # per-read httpx timeout; revisit from probe data
 
 # --- Real-service limits: from probe output / pasted docs ONLY -------------
-RPM_LIMIT: int | None = None
-TPM_LIMIT: int | None = None
-RPD_LIMIT: int | None = None
-TPD_LIMIT: int | None = None
+RPM_LIMIT: int | None = 30
+TPM_LIMIT: int | None = 8000  # header x-ratelimit-limit-tokens, stage A, 2026-11-12
+RPD_LIMIT: int | None = 1000  # header x-ratelimit-limit-requests, stage A, 2026-11-12
+TPD_LIMIT: int | None = 200_000
 MAX_IN_FLIGHT: int | None = None
 
 # --- Step 1: probe design (experiment parameters, NOT service limits) -------
 PROBE_SAFETY_FRACTION: float = 0.5  # pace stages B/C to at most this share of RPM/TPM
 PROBE_A_MAX_TOKENS: int = 512  # generous: a reasoning model may spend tokens before the answer
-PROBE_B_MAX_TOKENS: tuple[int, ...] = (16, 64, 256)
+PROBE_B_MAX_TOKENS: tuple[int, ...] = (256, 384, 512)
 PROBE_B_PROMPT_WORDS: tuple[int, ...] = (20, 1500)
 PROBE_B_REPS: int = 3
 PROBE_C_LEVELS: tuple[int, ...] = (1, 2, 4, 8)  # concurrent requests per burst
