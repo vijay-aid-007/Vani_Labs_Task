@@ -1,10 +1,29 @@
-# Python-generated files
-__pycache__/
-*.py[oc]
-build/
-dist/
-wheels/
-*.egg-info
+# secrets
+.env
+.env.*
+!.env.example
 
-# Virtual environments
-.venv
+# python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+*.egg-info/
+
+# editors / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# scratch / partial writes
+.cache/
+*.part
+
+# results/raw is a DELIVERABLE. Uncomment ONLY if the files get too large to
+# commit; then ship them zipped with the submission instead.
+# results/raw/
+results/raw/*.tmp
