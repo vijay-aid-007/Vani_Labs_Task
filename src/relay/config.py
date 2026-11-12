@@ -74,9 +74,10 @@ TOOL_TIMEOUT_S: float | None = None
 # --- Real model: Groq (step 1) ---------------------------------------------
 GROQ_BASE_URL: str = "https://api.groq.com/openai/v1"
 GROQ_API_KEY_ENV_VAR: str = "GROQ_API_KEY"
-GROQ_MODEL: str | None = None
-LLM_MAX_OUTPUT_TOKENS: int | None = None
+API_KEY_PREFIX: str = "gsk_"  # my assumption of Groq's key format; fix if your real key differs
+GROQ_MODEL: str | None = "openai/gpt-oss-20b"  # replaces retired llama-3.1-8b-instant (404 model_not_found)
 LLM_TEMPERATURE: float | None = None
+LLM_TIMEOUT_S: float = 60.0  # per-read httpx timeout; revisit from probe data
 
 # --- Real-service limits: from probe output / pasted docs ONLY -------------
 RPM_LIMIT: int | None = None
@@ -84,6 +85,21 @@ TPM_LIMIT: int | None = None
 RPD_LIMIT: int | None = None
 TPD_LIMIT: int | None = None
 MAX_IN_FLIGHT: int | None = None
+
+# --- Step 1: probe design (experiment parameters, NOT service limits) -------
+PROBE_SAFETY_FRACTION: float = 0.5  # pace stages B/C to at most this share of RPM/TPM
+PROBE_A_MAX_TOKENS: int = 512  # generous: a reasoning model may spend tokens before the answer
+PROBE_B_MAX_TOKENS: tuple[int, ...] = (16, 64, 256)
+PROBE_B_PROMPT_WORDS: tuple[int, ...] = (20, 1500)
+PROBE_B_REPS: int = 3
+PROBE_C_LEVELS: tuple[int, ...] = (1, 2, 4, 8)  # concurrent requests per burst
+PROBE_C_MAX_TOKENS: int = 64
+PROBE_C_COOLDOWN_S: float = 5.0
+PROBE_D_MAX_TOKENS: int = 8
+PROBE_D_EXTRA_REQUESTS: int = 5  # sent beyond RPM_LIMIT while provoking a 429
+PROBE_D_MAX_POLLS: int = 30
+PROBE_D_POLL_INTERVAL_S: float = 1.0
+TOKENS_PER_WORD_ESTIMATE: float = 1.5  # planning/pacing only; real counts come from usage
 
 # --- Stand-in service (step 2). Fitted params live in CALIBRATION_FILE ------
 STANDIN_HOST: str | None = None
@@ -101,4 +117,4 @@ RETRY_BASE_S: float | None = None
 RETRY_CAP_S: float | None = None
 RETRY_PER_REQUEST_CAP: int | None = None
 RETRY_GLOBAL_BUDGET: int | None = None
-NAIVE_RETRY_MODE: bool = False  # flag: immediate retries, for the experiment
+NAIVE_RETRY_MODE: bool = False  # flag: immediate retries, for the experiment   
