@@ -20,6 +20,8 @@ import sys
 import time
 from dataclasses import asdict
 from pathlib import Path
+from dotenv import load_dotenv
+
 
 import httpx
 
@@ -31,11 +33,11 @@ from relay.llm_client import get_api_key, stream_chat  # noqa: E402
 
 log = logging.getLogger("probe")
 
-
+load_dotenv(config.ROOT / ".env")  # does not override a variable already set in the environment
 async def stage_a(client: httpx.AsyncClient, key: str, w: RawWriter) -> None:
     """One minimal request: headers, TTFT, whether streaming reports usage."""
     await one(client, key, w, 20, config.PROBE_A_MAX_TOKENS, stage="A")
-    
+
 
 
 async def stage_b(client: httpx.AsyncClient, key: str, w: RawWriter) -> None:
