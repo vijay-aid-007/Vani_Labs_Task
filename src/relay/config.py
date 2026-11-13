@@ -57,19 +57,32 @@ PDF_EOF_SCAN_BYTES: int = 2048  # where to look for the %%EOF marker
 USER_AGENT: str = "relay-takehome/0.1"
 
 # --- Retrieval (step 3) ----------------------------------------------------
-EMBEDDING_MODEL: str | None = None
-CROSS_ENCODER_MODEL: str | None = None
-CHUNK_SIZE_CHARS: int | None = None
-CHUNK_OVERLAP_CHARS: int | None = None
-TOP_K: int | None = None
-RERANK_ENABLED: bool | None = None
-HYBRID_ALPHA: float | None = None  # weight of embeddings vs BM25
-SCORE_THRESHOLD: float | None = None  # refusal threshold (decided in code)
-RETRIEVAL_SETTINGS: dict[str, dict[str, object]] = {}  # >=3 named settings
+EMBEDDING_MODEL: str | None = "sentence-transformers/all-MiniLM-L6-v2"
+CROSS_ENCODER_MODEL: str | None = "cross-encoder/ms-marco-MiniLM-L-6-v2"
+CHUNK_SIZE_CHARS: int | None = 1000       # default/active setting; see RETRIEVAL_SETTINGS for the >=3 variants
+CHUNK_OVERLAP_CHARS: int | None = 150
+TOP_K: int | None = 5
+RERANK_ENABLED: bool | None = False
+HYBRID_ALPHA: float | None = 0.5  # weight of embeddings vs BM25 (0=pure BM25, 1=pure embeddings)
+SCORE_THRESHOLD: float | None = 0.15  # GUESS, not measured — tune against step 6's eval set
+RETRIEVAL_SETTINGS: dict[str, dict[str, object]] = {
+    "small_k3_norerank": {
+        "chunk_size_chars": 500, "chunk_overlap_chars": 100,
+        "top_k": 3, "rerank_enabled": False,
+    },
+    "medium_k5_rerank": {
+        "chunk_size_chars": 1000, "chunk_overlap_chars": 150,
+        "top_k": 5, "rerank_enabled": True,
+    },
+    "large_k8_norerank": {
+        "chunk_size_chars": 2000, "chunk_overlap_chars": 250,
+        "top_k": 8, "rerank_enabled": False,
+    },
+}
 
 # --- Pipeline (step 4) -----------------------------------------------------
 MAX_REDRAFTS: int = 1  # brief: redraft once, then refuse. Hard cap.
-TOOL_TIMEOUT_S: float | None = None
+TOOL_TIMEOUT_S: float | None = 5.0    # GUESS — local tools are near-instant; generous ceiling, not a fit
 
 # --- Real model: Groq (step 1) ---------------------------------------------
 GROQ_BASE_URL: str = "https://api.groq.com/openai/v1"
@@ -80,7 +93,7 @@ LLM_TEMPERATURE: float | None = None
 LLM_TIMEOUT_S: float = 60.0  # per-read httpx timeout; revisit from probe data
 
 # --- Real-service limits: from probe output / pasted docs ONLY -------------
-RPM_LIMIT: int | None = 30
+RPM_LIMIT: int | None = 30    # docs only; NOT enforced at 30 (stage D: 35 req in ~41 s x3, no 429).
 TPM_LIMIT: int | None = 8000  # header x-ratelimit-limit-tokens, stage A, 2026-11-12
 RPD_LIMIT: int | None = 1000  # header x-ratelimit-limit-requests, stage A, 2026-11-12
 TPD_LIMIT: int | None = 200_000
@@ -102,9 +115,23 @@ PROBE_D_MAX_POLLS: int = 30
 PROBE_D_POLL_INTERVAL_S: float = 1.0
 TOKENS_PER_WORD_ESTIMATE: float = 1.5  # planning/pacing only; real counts come from usage
 
-# --- Stand-in service (step 2). Fitted params live in CALIBRATION_FILE ------
-STANDIN_HOST: str | None = None
-STANDIN_PORT: int | None = None
+# --- Step 2: stand-in (fit + server) ---
+STANDIN_HOST = "127.0.0.1"
+STANDIN_PORT = 8001
+STANDIN_FIT_MIN_N = 5                  # fewest samples allowed for any fitted component
+STANDIN_FIT_MIN_CONTENT_TOKENS = 20    # ignore shorter answers when fitting decode speed
+STANDIN_CHUNK_TOKENS = 8               # tokens per streamed chunk
+STANDIN_FAIL_RATE = 0.0
+STANDIN_FAIL_STATUS = 503
+STANDIN_HANG_RATE = 0.0
+STANDIN_HANG_S = 3600.0
+STANDIN_SLOW_FACTOR = 1.0
+STANDIN_LOAD_SLOWDOWN_PER_INFLIGHT = None   # None = not measured -> no load slowdown
+STANDIN_RPM_ENFORCED = False           # probes showed no RPM 429
+STANDIN_REFUND_UNUSED = False          # refund of unused max_tokens: not measured
+STANDIN_DAILY_FROZEN_RETRY_AFTER_S = 86400.0   # chosen, NOT measured
+STANDIN_SERVER_LOG = Path(RAW_DIR) / "standin_server.jsonl"
+STANDIN_DAILY_FROZEN_RETRY_AFTER_S = 86400.0   # chosen, NOT measured
 
 # --- Load policy (step 5) --------------------------------------------------
 GIVEN_UP_AFTER_S: float | None = None  # "N": justified from measured data
