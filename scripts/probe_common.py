@@ -51,9 +51,6 @@ def pace_s(tokens: int) -> float:
 
 def print_plan() -> None:
     """Log request/token estimates per stage and the quota facts we do not have."""
-    rpm = config.RPM_LIMIT
-    nd = (f"<= {rpm + config.PROBE_D_EXTRA_REQUESTS} burst + <= {config.PROBE_D_MAX_POLLS} polls"
-          if rpm else "not measured (needs RPM_LIMIT)")
     nc = sum(config.PROBE_C_LEVELS)
     log.info("model=%s base_url=%s", config.GROQ_MODEL, config.GROQ_BASE_URL)
     log.info("A: 1 request, ~%d tokens (estimate)", est_tokens(20, config.PROBE_A_MAX_TOKENS))
@@ -61,11 +58,13 @@ def print_plan() -> None:
              len(b_cells()), sum(est_tokens(w, m) for w, m in b_cells()))
     log.info("C: %d requests in bursts %s, ~%d tokens (estimate)", nc, config.PROBE_C_LEVELS,
              nc * est_tokens(20, config.PROBE_C_MAX_TOKENS))
-    log.info("D: %s; tiny prompts", nd)
+    log.info("D: <= %d long-prompt requests (~%d tokens each, estimate) + <= %d recovery polls",
+             config.PROBE_D_MAX_REQUESTS,
+             est_tokens(config.PROBE_D_PROMPT_WORDS, config.PROBE_D_MAX_TOKENS),
+             config.PROBE_D_MAX_POLLS)
     log.info("Remaining daily budget: not measured (see x-ratelimit-remaining-requests in stage A)")
     log.info("RPM=%s TPM=%s RPD=%s TPD=%s (None = not measured)", config.RPM_LIMIT,
              config.TPM_LIMIT, config.RPD_LIMIT, config.TPD_LIMIT)
-
 
 def require_limits(stage: str) -> None:
     """Refuse stages B-D unless the limits they pace against are known."""

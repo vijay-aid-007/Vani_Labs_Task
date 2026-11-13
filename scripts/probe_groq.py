@@ -68,22 +68,25 @@ async def stage_c(client: httpx.AsyncClient, key: str, w: RawWriter) -> None:
 
 
 async def stage_d(client: httpx.AsyncClient, key: str, w: RawWriter) -> None:
-    """Burst until the first 429 (exact body kept), then poll to measure recovery time."""
-    assert config.RPM_LIMIT
+    """Burst long prompts until the first 429 (exact body kept), then poll for recovery time."""
+    words, mt = config.PROBE_D_PROMPT_WORDS, config.PROBE_D_MAX_TOKENS
     first_429: float | None = None
     wait: float | None = None
-    for i in range(config.RPM_LIMIT + config.PROBE_D_EXTRA_REQUESTS):
-        res = await one(client, key, w, 20, config.PROBE_D_MAX_TOKENS, stage="D", phase="burst", seq=i)
+    for i in range(config.PROBE_D_MAX_REQUESTS):
+        res = await one(client, key, w, words, mt, stage="D", phase="burst", seq=i)
         if res.status == 429:
             first_429, wait = time.perf_counter(), retry_after_s(res)
             break
+        if res.status != 200:
+            log.error("stage D stopped: unexpected status %s (record kept)", res.status)
+            return
     if first_429 is None:
-        log.warning("no 429 within the burst cap; the RPM limit was not reached")
+        log.warning("no 429 within %d requests; the limit was not reached", config.PROBE_D_MAX_REQUESTS)
         return
     await asyncio.sleep(wait if wait is not None else config.PROBE_D_POLL_INTERVAL_S)
     for poll in range(config.PROBE_D_MAX_POLLS):
-        res = await one(client, key, w, 20, config.PROBE_D_MAX_TOKENS, stage="D", phase="recovery",
-                        poll=poll, s_since_first_429=round(time.perf_counter() - first_429, 3))
+        res = await one(client, key, w, words, mt, stage="D", phase="recovery", poll=poll,
+                        s_since_first_429=round(time.perf_counter() - first_429, 3))
         if res.status == 200:
             log.info("recovered %.1fs after the first 429 (retry-after=%s)",
                      time.perf_counter() - first_429, wait)
