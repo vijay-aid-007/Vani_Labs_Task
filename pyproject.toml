@@ -7,7 +7,12 @@ authors = [
     { name = "vijay-aid-007", email = "vijayjoka25@gmail.com" }
 ]
 requires-python = ">=3.11"
-dependencies = []
+dependencies = [
+    "fastapi>=0.162.5",
+    "rank-bm25>=0.2.2",
+    "sentence-transformers>=6.3.0",
+    "uvicorn>=0.54.0",
+]
 
 [project.scripts]
 vani-lab-task = "vani_lab_task:main"
