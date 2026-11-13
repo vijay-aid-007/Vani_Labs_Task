@@ -1,0 +1,180 @@
+{
+  "schema": 1,
+  "created_utc": "2026-11-13T09:43:59.886212+00:00",
+  "model": "openai/gpt-oss-20b",
+  "seed": 42,
+  "source_files": [
+    "probe_A_20261112T014712Z_401_placeholder_key.jsonl",
+    "probe_A_20261112T020206Z_401_placeholder_key.jsonl",
+    "probe_A_20261112T021304Z_404_model_retired.jsonl",
+    "probe_A_20261112T110725Z.jsonl",
+    "probe_B_20261112T113015Z.jsonl",
+    "probe_C_20261112T114916Z.jsonl",
+    "probe_D_20261112T160004Z.jsonl",
+    "probe_D_20261112T160204Z.jsonl",
+    "probe_D_20261112T162525Z.jsonl",
+    "probe_D_20261113T012110Z.jsonl"
+  ],
+  "n_request_records": 149,
+  "n_ok": 145,
+  "fits": {
+    "queue_ms": {
+      "mu": 6.079698052518726,
+      "sigma": 0.8700994442583451,
+      "n": 144,
+      "min": 48.121947,
+      "median": 368.16623100000004,
+      "max": 3022.3155300000003
+    },
+    "overhead_ms": {
+      "mu": 5.7085457744931585,
+      "sigma": 0.6238334116267897,
+      "n": 144,
+      "min": 133.01171703056684,
+      "median": 256.4580691105137,
+      "max": 6860.0534110273975
+    },
+    "reasoning_phase": {
+      "slope": 1.2204655006096892,
+      "intercept": -3.452776402707144,
+      "n": 17,
+      "distinct_x": 16,
+      "resid_sd": 30.062232141124014,
+      "r": 0.9470342959577044
+    },
+    "reasoning_tokens": {
+      "mu": 4.807001866823619,
+      "sigma": 0.47770583093876545,
+      "n": 18,
+      "min": 51,
+      "median": 121.0,
+      "max": 335
+    },
+    "content_tokens": {
+      "mu": 5.284291890356021,
+      "sigma": 0.7924058616305257,
+      "n": 18,
+      "min": 13,
+      "median": 234.5,
+      "max": 398
+    },
+    "decode_tps": {
+      "mean": 871.1812519038724,
+      "sd": 141.67189699340832,
+      "n": 17,
+      "min": 586.134672586466,
+      "median": 897.8149981544215,
+      "max": 1094.6201055108993
+    },
+    "prompt_tokens": {
+      "slope": 1.0,
+      "intercept": 86.00000000000003,
+      "n": 145,
+      "distinct_x": 2,
+      "resid_sd": 2.7099036664298875e-14,
+      "r": 1.0
+    }
+  },
+  "usage_timing": {
+    "prompt_s_per_token": 6.769127358490567e-05,
+    "server_completion_tps": 953.3625753469256,
+    "n": 145
+  },
+  "empty_behavior": {
+    "n": 127,
+    "reasoning_offset": 2,
+    "completion_gap": 0,
+    "offsets_seen": [
+      2
+    ],
+    "gaps_seen": [
+      0
+    ]
+  },
+  "stream_shape": {
+    "events_parsed": 9019,
+    "delta_keys": [
+      "channel",
+      "content",
+      "reasoning",
+      "role"
+    ],
+    "reasoning_key": "reasoning",
+    "top_level_keys": [
+      "choices",
+      "created",
+      "id",
+      "model",
+      "object",
+      "system_fingerprint",
+      "usage",
+      "x_groq"
+    ],
+    "usage_in_x_groq": true,
+    "usage_top_level": true
+  },
+  "headers": {
+    "success": {
+      "names": [
+        "x-ratelimit-limit-requests",
+        "x-ratelimit-limit-tokens",
+        "x-ratelimit-remaining-requests",
+        "x-ratelimit-remaining-tokens",
+        "x-ratelimit-reset-requests",
+        "x-ratelimit-reset-tokens"
+      ],
+      "examples": {
+        "x-ratelimit-limit-requests": "1000",
+        "x-ratelimit-limit-tokens": "8000",
+        "x-ratelimit-remaining-requests": "999",
+        "x-ratelimit-remaining-tokens": "7685",
+        "x-ratelimit-reset-requests": "1m26.4s",
+        "x-ratelimit-reset-tokens": "2.362s"
+      }
+    },
+    "429": {
+      "names": [
+        "retry-after",
+        "x-ratelimit-limit-requests",
+        "x-ratelimit-limit-tokens",
+        "x-ratelimit-remaining-requests",
+        "x-ratelimit-remaining-tokens",
+        "x-ratelimit-reset-requests",
+        "x-ratelimit-reset-tokens"
+      ],
+      "examples": {
+        "retry-after": "9",
+        "x-ratelimit-limit-requests": "1000",
+        "x-ratelimit-limit-tokens": "8000",
+        "x-ratelimit-remaining-requests": "995",
+        "x-ratelimit-remaining-tokens": "448",
+        "x-ratelimit-reset-requests": "7m12s",
+        "x-ratelimit-reset-tokens": "56.64s"
+      }
+    }
+  },
+  "rate_limit_429": {
+    "n": 1,
+    "recorded_body": "{\"error\":{\"message\":\"Rate limit reached for model `openai/gpt-oss-20b` in organization `org_REDACTED` service tier `on_demand` on tokens per minute (TPM): Limit 8000, Used 7552, Requested 1594. Please try again in 8.594999999s. Need more tokens? Upgrade to Dev Tier today at https://console.groq.com/settings/billing\",\"type\":\"tokens\",\"code\":\"rate_limit_exceeded\"}}\n",
+    "recorded_headers": {
+      "retry-after": "9",
+      "x-ratelimit-limit-requests": "1000",
+      "x-ratelimit-limit-tokens": "8000",
+      "x-ratelimit-remaining-requests": "995",
+      "x-ratelimit-remaining-tokens": "448",
+      "x-ratelimit-reset-requests": "7m12s",
+      "x-ratelimit-reset-tokens": "56.64s"
+    },
+    "message_pattern_matches": true,
+    "latency_ms": [
+      289.7127999458462
+    ],
+    "tier": "on_demand",
+    "limit": 8000,
+    "used": 7552,
+    "requested": 1594,
+    "body_secs": 8.594999999,
+    "retry_after_rule_ok": true,
+    "reset_tokens_formula_err_s": 0.0
+  }
+}
